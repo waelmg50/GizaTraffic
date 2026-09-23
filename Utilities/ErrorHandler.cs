@@ -334,7 +334,8 @@ namespace Utilities
         {
             try
             {
-                string ErrorFilePath = System.Windows.Forms.Application.StartupPath + @"\Error.txt";
+                string ErrorFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name ?? "Application", "Error.txt");
+                ErrorFilePath = Path.ChangeExtension(ErrorFilePath, "txt");
                 if (!File.Exists(ErrorFilePath))
                 {
                     FileStream fsErrorFileCreator = File.Create(ErrorFilePath);
