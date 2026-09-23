@@ -97,7 +97,7 @@ namespace Utilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to برنامج تسجيل حجز المراكب.
+        ///   Looks up a localized string similar to برنامج تسجيل حجز المركبات.
         /// </summary>
         internal static string MesHeader {
             get {

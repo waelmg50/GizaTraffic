@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Utilities;
 
 namespace GizaTraffic.DBContext
 {
@@ -8,10 +9,15 @@ namespace GizaTraffic.DBContext
     {
         public GizaTrafficDBContext CreateDbContext(string[] args)
         {
-            var configuration = new ConfigurationBuilder().SetBasePath(AppDomain.CurrentDomain.BaseDirectory).AddJsonFile("appsettings.json").Build();
+            AppSettingsService settings = new();
+            string? connectionString = settings.GetConnectionString();
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException("Database connection string is not configured.");
+            }
             var optionsBuilder = new DbContextOptionsBuilder<GizaTrafficDBContext>();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DBConnection")).EnableSensitiveDataLogging(true).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            return new GizaTrafficDBContext(optionsBuilder.Options, configuration);
+            optionsBuilder.UseSqlServer(connectionString).EnableSensitiveDataLogging(false).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            return new GizaTrafficDBContext(optionsBuilder.Options);
         }
     }
 }

@@ -130,7 +130,7 @@
     <value>لا يمكن الكتابة هنا</value>
   </data>
   <data name="MesHeader" xml:space="preserve">
-    <value>برنامج تسجيل حجز المراكب</value>
+    <value>برنامج تسجيل حجز المركبات</value>
   </data>
   <data name="MesNoArabicInput" xml:space="preserve">
     <value>لا يمكن الكتابة باللغة العربية هنا</value>

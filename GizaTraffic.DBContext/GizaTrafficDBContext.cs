@@ -10,15 +10,15 @@ namespace GizaTraffic.DBContext
 
         #region Members
 
-        private readonly IConfiguration _config;
+        //private readonly IConfiguration _config;
 
         #endregion
 
         #region Constructor
 
-        public GizaTrafficDBContext(DbContextOptions<GizaTrafficDBContext> options, IConfiguration config) : base(options)
+        public GizaTrafficDBContext(DbContextOptions<GizaTrafficDBContext> options) : base(options)
         {
-            _config = config;
+            //_config = config;
         }
 
         #endregion
@@ -41,10 +41,10 @@ namespace GizaTraffic.DBContext
 
         #region Overrided Methods
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_config.GetConnectionString("DBConnection"));
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(_config.GetConnectionString("DBConnection"));
+        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
