@@ -21,12 +21,55 @@ namespace Utilities.Forms
             SqlConnectionStringBuilder builder = new()
             {
                 DataSource = txtServer.Text.Trim(),
-                InitialCatalog = txtDatabase.Text.Trim(),
-                UserID = txtUsername.Text.Trim(),
-                Password = txtPassword.Text,
+                InitialCatalog = txtDatabase.Text.Trim() == string.Empty ? "master" : txtDatabase.Text.Trim(),
                 TrustServerCertificate = true,
                 Encrypt = false
             };
+            if (rbWindowsAuthentication.Checked)
+            {
+                // Windows Authentication
+                builder.IntegratedSecurity = true;
+            }
+            else
+            {
+                // SQL Server Authentication
+                builder.UserID = txtUsername.Text.Trim();
+                builder.Password = txtPassword.Text;
+            }
+            return builder.ConnectionString;
+        }
+        
+        // ==========================================================
+        // BUILD SERVER-ONLY CONNECTION STRING
+        // ==========================================================
+
+        private string BuildServerConnectionString()
+        {
+            SqlConnectionStringBuilder builder = new()
+            {
+                DataSource = txtServer.Text.Trim(),
+
+                // Connect to master instead of the
+                // database that may not exist yet.
+                InitialCatalog = "master",
+
+                TrustServerCertificate = true,
+
+                Encrypt = false
+            };
+
+            if (rbWindowsAuthentication.Checked)
+            {
+                builder.IntegratedSecurity = true;
+            }
+            else
+            {
+                builder.UserID =
+                    txtUsername.Text.Trim();
+
+                builder.Password =
+                    txtPassword.Text;
+            }
 
             return builder.ConnectionString;
         }
@@ -38,11 +81,14 @@ namespace Utilities.Forms
             if (string.IsNullOrWhiteSpace(txtDatabase.Text))
                 Helper.ShowMessage("Please enter the database name.");
 
-            if (string.IsNullOrWhiteSpace(txtUsername.Text))
-                Helper.ShowMessage("Please enter the username.");
+            if (rbSqlAuthentication.Checked)
+            {
+                if (string.IsNullOrWhiteSpace(txtUsername.Text))
+                    Helper.ShowMessage("Please enter the username.");
 
-            if (string.IsNullOrWhiteSpace(txtPassword.Text))
-                Helper.ShowMessage("Please enter the password.");
+                if (string.IsNullOrWhiteSpace(txtPassword.Text))
+                    Helper.ShowMessage("Please enter the password.");
+            }
         }
 
         #endregion
@@ -55,15 +101,16 @@ namespace Utilities.Forms
             {
                 ValidateInputs();
 
-                string connectionString = BuildConnectionString();
+                string connectionString = BuildServerConnectionString();
 
                 btnTest.Enabled = false;
+                btnSave.Enabled = false;
 
                 await using SqlConnection connection = new(connectionString);
 
                 await connection.OpenAsync();
 
-                Helper.ShowMessage("Database connection successful.");
+                Helper.ShowMessage("Sql Server connection successful.");
             }
             catch (Exception ex)
             {
@@ -72,26 +119,33 @@ namespace Utilities.Forms
             finally
             {
                 btnTest.Enabled = true;
+                btnSave.Enabled = true;
             }
         }
-
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
             try
             {
                 ValidateInputs();
 
-                string connectionString = BuildConnectionString();
+                // IMPORTANT:
+                // Test against master, not the GizaTraffic database.
+                string serverConnectionString = BuildServerConnectionString();
 
+                btnTest.Enabled = false;
                 btnSave.Enabled = false;
 
-                // Test before saving.
-                using SqlConnection connection = new(connectionString);
-                connection.Open();
+                await using (SqlConnection connection = new(serverConnectionString))
+                {
+                    await connection.OpenAsync();
+                }
 
-                // Save encrypted connection string.
+                // Build the REAL connection string.
+                // This one contains Database from the text box.
+                string connectionString = BuildConnectionString();
+
+                // Encrypt and save it.
                 AppSettingsService settings = new();
-
                 settings.SaveConnectionString(connectionString);
 
                 Helper.ShowMessage("Database configuration saved successfully.");
@@ -104,11 +158,24 @@ namespace Utilities.Forms
             }
             finally
             {
+                btnTest.Enabled = true;
                 btnSave.Enabled = true;
+            }
+        }
+        private void Authentication_CheckedChanged(object sender, EventArgs e)
+        {
+            bool sqlAuthentication = rbSqlAuthentication.Checked;
+            txtUsername.Enabled = sqlAuthentication;
+            txtPassword.Enabled = sqlAuthentication;
+            if (!sqlAuthentication)
+            {
+                txtUsername.Clear();
+                txtPassword.Clear();
             }
         }
 
         #endregion
 
+        
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Utilities
+﻿using System.ComponentModel;
+
+namespace Utilities
 {
     [Serializable]
     public class NumericTextBox : TextBox
@@ -15,6 +17,7 @@
         /// <summary>
         /// Gets or sets a value that Determines wether the text box should be Integer or Text.
         /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool IsInt
         {
             get { return _IsInt; }

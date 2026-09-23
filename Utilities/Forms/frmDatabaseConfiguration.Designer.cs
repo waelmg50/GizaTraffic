@@ -39,6 +39,9 @@
             txtPassword = new TextBox();
             btnTest = new Button();
             btnSave = new Button();
+            lblAuthentication = new Label();
+            rbWindowsAuthentication = new RadioButton();
+            rbSqlAuthentication = new RadioButton();
             SuspendLayout();
             // 
             // lblServer
@@ -76,7 +79,7 @@
             // lblUsername
             // 
             lblUsername.AutoSize = true;
-            lblUsername.Location = new Point(30, 120);
+            lblUsername.Location = new Point(30, 195);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(78, 20);
             lblUsername.TabIndex = 0;
@@ -84,15 +87,15 @@
             // 
             // txtUsername
             // 
-            txtUsername.Location = new Point(140, 115);
+            txtUsername.Location = new Point(140, 190);
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(300, 27);
-            txtUsername.TabIndex = 2;
+            txtUsername.TabIndex = 4;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(30, 165);
+            label1.Location = new Point(30, 240);
             label1.Name = "label1";
             label1.Size = new Size(73, 20);
             label1.TabIndex = 0;
@@ -100,37 +103,73 @@
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(140, 160);
+            txtPassword.Location = new Point(140, 235);
             txtPassword.Name = "txtPassword";
             txtPassword.Size = new Size(300, 27);
-            txtPassword.TabIndex = 3;
+            txtPassword.TabIndex = 5;
             txtPassword.UseSystemPasswordChar = true;
             // 
             // btnTest
             // 
-            btnTest.Location = new Point(140, 215);
+            btnTest.Location = new Point(140, 290);
             btnTest.Name = "btnTest";
-            btnTest.Size = new Size(140, 29);
-            btnTest.TabIndex = 4;
+            btnTest.Size = new Size(140, 35);
+            btnTest.TabIndex = 6;
             btnTest.Text = "Test Connection";
             btnTest.UseVisualStyleBackColor = true;
             btnTest.Click += btnTest_Click;
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(300, 215);
+            btnSave.Location = new Point(300, 290);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(140, 29);
-            btnSave.TabIndex = 5;
+            btnSave.Size = new Size(140, 35);
+            btnSave.TabIndex = 7;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
+            // 
+            // lblAuthentication
+            // 
+            lblAuthentication.AutoSize = true;
+            lblAuthentication.Location = new Point(30, 120);
+            lblAuthentication.Name = "lblAuthentication";
+            lblAuthentication.Size = new Size(109, 20);
+            lblAuthentication.TabIndex = 6;
+            lblAuthentication.Text = "Authentication:";
+            // 
+            // rbWindowsAuthentication
+            // 
+            rbWindowsAuthentication.AutoSize = true;
+            rbWindowsAuthentication.Location = new Point(150, 115);
+            rbWindowsAuthentication.Name = "rbWindowsAuthentication";
+            rbWindowsAuthentication.Size = new Size(192, 24);
+            rbWindowsAuthentication.TabIndex = 2;
+            rbWindowsAuthentication.Text = "Windows Authentication";
+            rbWindowsAuthentication.UseVisualStyleBackColor = true;
+            rbWindowsAuthentication.CheckedChanged += Authentication_CheckedChanged;
+            // 
+            // rbSqlAuthentication
+            // 
+            rbSqlAuthentication.AutoSize = true;
+            rbSqlAuthentication.Checked = true;
+            rbSqlAuthentication.Location = new Point(150, 145);
+            rbSqlAuthentication.Name = "rbSqlAuthentication";
+            rbSqlAuthentication.Size = new Size(202, 24);
+            rbSqlAuthentication.TabIndex = 3;
+            rbSqlAuthentication.TabStop = true;
+            rbSqlAuthentication.Text = "SQL Server Authentication";
+            rbSqlAuthentication.UseVisualStyleBackColor = true;
+            rbSqlAuthentication.CheckedChanged += Authentication_CheckedChanged;
             // 
             // frmDatabaseConfiguration
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(482, 283);
+            ClientSize = new Size(502, 343);
+            Controls.Add(rbSqlAuthentication);
+            Controls.Add(rbWindowsAuthentication);
+            Controls.Add(lblAuthentication);
             Controls.Add(btnSave);
             Controls.Add(btnTest);
             Controls.Add(txtPassword);
@@ -164,5 +203,8 @@
         private TextBox txtPassword;
         private Button btnTest;
         private Button btnSave;
+        private Label lblAuthentication;
+        private RadioButton rbWindowsAuthentication;
+        private RadioButton rbSqlAuthentication;
     }
 }

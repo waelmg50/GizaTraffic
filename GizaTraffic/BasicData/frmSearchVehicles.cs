@@ -7,6 +7,7 @@ using GizaTraffic.Settings;
 using System.Drawing.Printing;
 using Utilities;
 using static System.Net.Mime.MediaTypeNames;
+using System.ComponentModel;
 
 namespace GizaTraffic
 {
@@ -15,6 +16,7 @@ namespace GizaTraffic
 
         #region Members
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int CurrentVehicleImpoundID { get; set; }
         private int _currentPage = 1;
         private int _pageSize = 50;
