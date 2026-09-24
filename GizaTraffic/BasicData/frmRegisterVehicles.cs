@@ -211,15 +211,18 @@ namespace GizaTraffic.BasicData
         }
         void DisplayVehicleNo(string vehicleNo)
         {
-            if (string.IsNullOrWhiteSpace(vehicleNo) || vehicleNo.Length < 4)
+            if (string.IsNullOrWhiteSpace(vehicleNo))
+                return;
+            string vehicleNoWithoutSpaces = vehicleNo.Replace(" ", string.Empty);
+            if (vehicleNoWithoutSpaces.Length < 4)
             {
-                txtVehicleNoAlphabitics3.Text = ArabicNumbers.ToArabicDigits(vehicleNo);
+                txtVehicleNoAlphabitics3.Text = ArabicNumbers.ToArabicDigits(vehicleNoWithoutSpaces);
                 return;
             }
-            string strIntegralPart = vehicleNo.Substring(vehicleNo.Length - 4, 4);
+            string strIntegralPart = vehicleNoWithoutSpaces.Substring(vehicleNo.Length - 4, 4);
             ntxtCarNo.Text = ArabicNumbers.ToArabicDigits(strIntegralPart);
-            string strAlphabiticsPart = vehicleNo.Substring(0, vehicleNo.Length - 4);
-            txtVehicleNoAlphabitics1.Text = ArabicNumbers.ToArabicDigits(strAlphabiticsPart.Length > 0 ? strAlphabiticsPart.Substring(0, 1) : string.Empty);
+            string strAlphabiticsPart = vehicleNoWithoutSpaces[..^4];
+            txtVehicleNoAlphabitics1.Text = ArabicNumbers.ToArabicDigits(strAlphabiticsPart.Length > 0 ? strAlphabiticsPart[..1] : string.Empty);
             txtVehicleNoAlphabitics2.Text = ArabicNumbers.ToArabicDigits(strAlphabiticsPart.Length > 1 ? strAlphabiticsPart.Substring(1, 1) : string.Empty);
             txtVehicleNoAlphabitics3.Text = ArabicNumbers.ToArabicDigits(strAlphabiticsPart.Length > 2 ? strAlphabiticsPart.Substring(2, 1) : string.Empty);
             txtVehicleNoAlphabitics1.Focus();
@@ -364,25 +367,18 @@ namespace GizaTraffic.BasicData
                 _convertingNumbers = false;
             }
         }
-
-        #endregion
-
         private void txtVehicleNoAlphabitics3_TextChanged(object sender, EventArgs e)
         {
             ntxtCarNo.Focus();
         }
-
         private void txtVehicleNoAlphabitics2_TextChanged(object sender, EventArgs e)
         {
             txtVehicleNoAlphabitics3.Focus();
         }
-
         private void txtVehicleNoAlphabitics1_TextChanged(object sender, EventArgs e)
         {
-
             txtVehicleNoAlphabitics2.Focus();
         }
-
         private async void txtVehicleImpoundNumber_Leave(object sender, EventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(txtVehicleImpoundNumber.Text))
@@ -394,5 +390,8 @@ namespace GizaTraffic.BasicData
                 }
             }
         }
+
+        #endregion
+
     }
 }

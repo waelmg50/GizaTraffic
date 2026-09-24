@@ -18,6 +18,7 @@ namespace GizaTraffic.Services.Interfaces
         Task<PagedResult<T>> Get(IEnumerable<SortColumn<T>>? sort, int skip, int take);
         Task<IEnumerable<T>> GetQuery(Expression<Func<T, bool>> predicate);
         Task<PagedResult<T>> Get(Expression<Func<T, bool>>? predicate, IEnumerable<SortColumn<T>>? sortColumns, int pageNumber, int pageSize);
+        Task<PagedResult<TResult>> Get<TResult>(Expression<Func<T, bool>>? predicate, Expression<Func<T, TResult>> selector, IEnumerable<SortColumn<T>>? sortColumns, int pageNumber, int pageSize);
         Task<T?> GetOne(Expression<Func<T, bool>> predicate);
         Task<string> GetData(string sqlStatement, CommandType commandType, params SqlParameter[] parameters);
         Task<string> GetDataSet(string sqlStatement, CommandType commandType, params SqlParameter[] parameters);

@@ -41,11 +41,108 @@ namespace GizaTraffic.Repositories
             return await _context.Set<T>().FindAsync(id);
         }
 
+        //public virtual async Task<PagedResult<T>> Get(IEnumerable<SortColumn<T>>? sort, int skip, int take)
+        //{
+        //    return await Get(null, sort, skip, take);
+        //}
+        //public virtual async Task<PagedResult<T>> Get(Expression<Func<T, bool>>? predicate, IEnumerable<SortColumn<T>>? sortColumns, int pageNumber, int pageSize)
+        //{
+        //    if (pageNumber < 1)
+        //        pageNumber = 1;
+
+        //    if (pageSize < 1)
+        //        pageSize = 50;
+
+        //    IQueryable<T> query = _context.Set<T>()
+        //        .AsNoTracking();
+
+        //    // -------------------------
+        //    // WHERE
+        //    // -------------------------
+        //    if (predicate != null)
+        //        query = query.Where(predicate);
+
+        //    // -------------------------
+        //    // TOTAL COUNT
+        //    // -------------------------
+        //    int totalCount = await query.CountAsync();
+
+        //    // -------------------------
+        //    // ORDER BY
+        //    // -------------------------
+        //    if (sortColumns != null)
+        //    {
+        //        bool firstSort = true;
+
+        //        foreach (var sortColumn in sortColumns)
+        //        {
+        //            if (firstSort)
+        //            {
+        //                query = sortColumn.Ascending
+        //                    ? query.OrderBy(sortColumn.Expression)
+        //                    : query.OrderByDescending(sortColumn.Expression);
+
+        //                firstSort = false;
+        //            }
+        //            else
+        //            {
+        //                query = sortColumn.Ascending
+        //                    ? ((IOrderedQueryable<T>)query)
+        //                        .ThenBy(sortColumn.Expression)
+        //                    : ((IOrderedQueryable<T>)query)
+        //                        .ThenByDescending(sortColumn.Expression);
+        //            }
+        //        }
+        //    }
+
+        //    // -------------------------
+        //    // PAGINATION
+        //    // -------------------------
+        //    int skip = (pageNumber - 1) * pageSize;
+
+        //    query = query
+        //        .Skip(skip)
+        //        .Take(pageSize);
+
+        //    // -------------------------
+        //    // EXECUTE
+        //    // -------------------------
+        //    var items = await query.ToListAsync();
+
+        //    return new PagedResult<T>
+        //    {
+        //        Items = items,
+        //        TotalCount = totalCount,
+        //        PageNumber = pageNumber,
+        //        PageSize = pageSize
+        //    };
+        //}
         public virtual async Task<PagedResult<T>> Get(IEnumerable<SortColumn<T>>? sort, int skip, int take)
         {
             return await Get(null, sort, skip, take);
         }
-        public virtual async Task<PagedResult<T>> Get(Expression<Func<T, bool>>? predicate, IEnumerable<SortColumn<T>>? sortColumns, int pageNumber, int pageSize)
+
+        // NEW: projection overload
+        public virtual async Task<PagedResult<TResult>> Get<TResult>(Expression<Func<T, TResult>> selector, IEnumerable<SortColumn<T>>? sort, int skip,
+            int take)
+        {
+            return await Get(null, selector, sort, skip, take);
+        }
+
+        public virtual async Task<PagedResult<T>> Get(Expression<Func<T, bool>>? predicate, IEnumerable<SortColumn<T>>? sortColumns, int pageNumber,
+            int pageSize)
+        {
+            return await GetInternal<T>(predicate: predicate, selector: null, sortColumns: sortColumns, pageNumber: pageNumber, pageSize: pageSize);
+        }
+
+        // NEW: predicate + projection overload
+        public virtual async Task<PagedResult<TResult>> Get<TResult>(Expression<Func<T, bool>>? predicate, Expression<Func<T, TResult>> selector, IEnumerable<SortColumn<T>>? sortColumns, int pageNumber, int pageSize)
+        {
+            return await GetInternal(predicate, selector, sortColumns, pageNumber, pageSize);
+        }
+
+        // Shared implementation — selector is null when no projection requested
+        private async Task<PagedResult<TResult>> GetInternal<TResult>(Expression<Func<T, bool>>? predicate, Expression<Func<T, TResult>>? selector, IEnumerable<SortColumn<T>>? sortColumns, int pageNumber, int pageSize)
         {
             if (pageNumber < 1)
                 pageNumber = 1;
@@ -68,7 +165,7 @@ namespace GizaTraffic.Repositories
             int totalCount = await query.CountAsync();
 
             // -------------------------
-            // ORDER BY
+            // ORDER BY (on T, before projection)
             // -------------------------
             if (sortColumns != null)
             {
@@ -105,11 +202,23 @@ namespace GizaTraffic.Repositories
                 .Take(pageSize);
 
             // -------------------------
-            // EXECUTE
+            // PROJECT (after pagination — EF translates to SQL)
             // -------------------------
-            var items = await query.ToListAsync();
+            List<TResult> items;
 
-            return new PagedResult<T>
+            if (selector != null)
+            {
+                items = await query
+                    .Select(selector)
+                    .ToListAsync();
+            }
+            else
+            {
+                // selector can only be null for TResult == T (called from the non-generic overloads)
+                items = (List<TResult>)(object)await query.ToListAsync();
+            }
+
+            return new PagedResult<TResult>
             {
                 Items = items,
                 TotalCount = totalCount,
@@ -127,7 +236,7 @@ namespace GizaTraffic.Repositories
         }
         public virtual async Task<T?> GetOne(Expression<Func<T, bool>> predicate)
         {
-            return await _context.Set<T>().AsNoTracking().FirstAsync(predicate);
+            return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate);
         }
         public virtual async Task<string> GetData(string sqlStatement, CommandType commandType, params SqlParameter[] parameters)
         {

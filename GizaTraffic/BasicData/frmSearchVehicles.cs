@@ -208,7 +208,7 @@ namespace GizaTraffic
                 (x.VehicleEngineNumber != null && x.VehicleEngineNumber.ToLower().Contains(searchText)) ||
                 (x.VehicleColor != null && x.VehicleColor.ToLower().Contains(searchText)) ||
                 x.VehicleImpoundNumber.ToLower().Contains(searchText) ||
-                x.VehicleSector == searchText,
+                x.VehicleSector == searchText, x => new VehiclesImpoundDto() { CaseReportNumber = x.CaseReportNumber, CaseReportType = x.CaseReportType, OwnerName = x.OwnerName, VehicleImpoundId = x.VehicleImpoundId, VehicleImpoundNumber = x.VehicleImpoundNumber, VehicleNo = x.VehicleNo, VehicleSector = x.VehicleSector },
                 [
                     //new SortColumn<VehicleImpound>() { Expression = x => x.VehicleNo, Ascending = true },
                 new SortColumn<VehicleImpound>() { Expression = x => x.VehicleImpoundId, Ascending = false }
@@ -228,17 +228,11 @@ namespace GizaTraffic
                     await LoadSearchResultsAsync(); return;
                 }
                 lblNoOfSearchResultsLabel.Text = _totalRecords.ToString();
-
-                dgvSearchResults.DataSource = result.Items.Select(x => new VehiclesImpoundDto
+                foreach (var item in result.Items)
                 {
-                    VehicleImpoundId = x.VehicleImpoundId,
-                    VehicleNo = x.VehicleNo,
-                    OwnerName = x.OwnerName,
-                    VehicleImpoundNumber = x.VehicleImpoundNumber,
-                    VehicleSector = x.VehicleSector,
-                    CaseReportNumber = x.CaseReportNumber,
-                    CaseReportType = x.CaseReportType
-                }).ToList();
+                    item.VehicleNo = VehicleImpound.DisplayVehicleNo(item.VehicleNo ?? string.Empty);
+                }
+                dgvSearchResults.DataSource = result.Items;
                 UpdatePaginationUI();
             }
             catch (Exception ex)
