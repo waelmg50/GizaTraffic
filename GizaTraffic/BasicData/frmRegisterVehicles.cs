@@ -127,11 +127,8 @@ namespace GizaTraffic.BasicData
                     }
                     printDocument.PrintPage += (sender, e) =>
                     {
-                        e.Graphics.DrawString($"رقم الحجز : {vehicleImpound.VehicleImpoundNumber} - مكان الحجز : {vehicleImpound.VehicleSector}", new System.Drawing.Font("Arial", 16, FontStyle.Bold), Brushes.Black, new PointF(100, 50));
-                        e.Graphics.DrawImage(
-                            qrImage,
-                            new Rectangle(100, 100, 300, 300)
-                        );
+                        e.Graphics?.DrawString($"رقم الحجز : {vehicleImpound.VehicleImpoundNumber} - مكان الحجز : {vehicleImpound.VehicleSector}", new System.Drawing.Font("Arial", 16, FontStyle.Bold), Brushes.Black, new PointF(100, 50));
+                        e.Graphics?.DrawImage(qrImage, new Rectangle(100, 100, 300, 300));
                     };
 
                     printDocument.Print();

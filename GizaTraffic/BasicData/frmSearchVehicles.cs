@@ -60,7 +60,7 @@ namespace GizaTraffic
         {
             if (dgvSearchResults.CurrentRow != null && dgvSearchResults.CurrentRow.DataBoundItem is VehiclesImpoundDto selectedVehicle)
             {
-                object vehicleImpoundIdValue = dgvSearchResults.CurrentRow.Cells["VehicleImpoundId"].Value;
+                object? vehicleImpoundIdValue = dgvSearchResults.CurrentRow.Cells["VehicleImpoundId"].Value;
                 CurrentVehicleImpoundID = vehicleImpoundIdValue != null ? Convert.ToInt32(vehicleImpoundIdValue) : 0;
                 Close();
             }
@@ -136,7 +136,7 @@ namespace GizaTraffic
                     Helper.ShowMessage("لم يتم إدخال إعدادات الطباعة");
                     return;
                 }
-                if (e.ColumnIndex == dgvSearchResults.Columns["PrintText"].Index && e.RowIndex >= 0)
+                if (e.ColumnIndex == dgvSearchResults.Columns["PrintText"]?.Index && e.RowIndex >= 0)
                 {
                     if (dgvSearchResults.CurrentRow != null && dgvSearchResults.CurrentRow.DataBoundItem is VehiclesImpoundDto selectedVehicle)
                     {
@@ -144,6 +144,8 @@ namespace GizaTraffic
                         if (vehicleImpound != null)
                         {
                             string printText = vehicleImpound.ToString();
+                            PrintDialog printDialog = new();
+
                             PrintDocument printDocument = new();
                             using System.Drawing.Font font = new("Arial", 12);
 
@@ -152,7 +154,6 @@ namespace GizaTraffic
                                 Alignment = StringAlignment.Near,
                                 LineAlignment = StringAlignment.Near
                             };
-
                             printDocument.PrintPage += (sender, e) =>
                             {
                                 RectangleF textArea = new(
@@ -162,10 +163,14 @@ namespace GizaTraffic
                                     e.PageBounds.Height - 70    // Height
                                 );
 
-                                e.Graphics.DrawString($"{settings.QRCodeHeader}\n{printText}\n{settings.QRCodeFooter}", font, Brushes.Black, textArea, format);
+                                e.Graphics?.DrawString($"{settings.QRCodeHeader}\n{printText}\n{settings.QRCodeFooter}", font, Brushes.Black, textArea, format);
                             };
-
-                            printDocument.Print();
+                            printDialog.Document = printDocument;
+                            if (printDialog.ShowDialog(this) == DialogResult.OK)
+                            {
+                                printDocument.PrinterSettings = printDialog.PrinterSettings;
+                                printDocument.Print();
+                            }
                         }
                     }
                 }
